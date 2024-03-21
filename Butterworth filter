@@ -1,0 +1,42 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import butter, filtfilt
+
+#Define a function to create a Butterworth filter.
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+#Apply the filter to your EEG data using the defined function.
+def filter_eeg(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    filtered_data = filtfilt(b, a, data)
+    return filtered_data
+# Load EEG data (replace this with your actual data loading code)
+fs = 1000  # Sample rate in Hz
+t = np.linspace(0, 1, fs, endpoint=False)
+
+# this is the eeg data, you can change with your data
+eeg_data = np.sin(2 * np.pi * 10 * t) + 0.5 * np.sin(2 * np.pi * 60 * t)
+
+# Define filter parameters
+lowcut = 1  # Low cutoff frequency in Hz
+highcut = 50  # High cutoff frequency in Hz
+order = 4  # Filter order
+
+# Filter EEG data
+filtered_data = filter_eeg(eeg_data, lowcut, highcut, fs, order=order)
+
+# Plot original and filtered EEG data
+plt.figure(figsize=(10, 6))
+plt.plot(t, eeg_data, label='Original EEG Data')
+plt.plot(t, filtered_data, label='Filtered EEG Data')
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.title('EEG Data Using Butterworth Filtering')
+plt.legend()
+plt.grid(True)
+plt.show()
